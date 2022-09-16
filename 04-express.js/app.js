@@ -1,16 +1,20 @@
 // const http = require('http');
 
 const express = require('express');
-const app = express();
+const path = require('path');
+const bodyParser = require('body-parser');
 
-app.use('/add-product', (req, res, next) => {
-  console.log('Another middleware!!');
-  res.send('<h1>Add product page</h1>');
-});
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
+
+const app = express();
+app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use('/admin', adminRoutes);
+app.use(shopRoutes);
 
 app.use('/', (req, res, next) => {
-  console.log('Another middleware!!');
-  res.send('<h1>Hello there from Express</h1>');
+  res.status(404).sendFile(path.join(__dirname, 'views', '404.html'));
 });
 
 app.listen(3000);
