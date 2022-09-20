@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include("includes/head.ejs") %>
+  <body>
+    <% if (usernames.length > 0){ %>
+    <ul>
+      <% usernames.forEach((username)=>{ %>
+      <li><%= username %></li>
+      <% }) %>
+    </ul>
+    <% } else { %>
+    <h1>No users yet...</h1>
+    <% } %>
+  </body>
+</html>
