@@ -11,6 +11,7 @@
   "author": "Maximilian Schwarzmüller",
   "license": "ISC",
   "devDependencies": {
+    "@types/express-handlebars": "^6.0.0",
     "nodemon": "^2.0.20"
   },
   "dependencies": {
