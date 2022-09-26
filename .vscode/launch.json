@@ -9,9 +9,9 @@
       "request": "launch",
       "name": "Launch Program",
       "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}\\03-node-server\\app.js",
+      // "program": "${workspaceFolder}\\03-node-server\\app.js",
       "restart": true,
-      "runtimeExecutable": "nodemon",
+      // "runtimeExecutable": "nodemon",
       "console": "integratedTerminal"
     }
   ]
