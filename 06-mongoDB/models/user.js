@@ -42,6 +42,53 @@ class User {
       );
   }
 
+  getCart() {
+    return getDb()
+      .collection('products')
+      .find({ _id: { $in: this.cart.items.map((item) => item.productId) } })
+      .toArray()
+      .then((products) =>
+        products.map((p) => {
+          return {
+            ...p,
+            quantity: this.cart.items.find(
+              (item) => item.productId.toString() === p._id.toString()
+            ).quantity,
+          };
+        })
+      );
+  }
+
+  deleteItemFromCart(prodId) {
+    const updatedCartItems = this.cart.items.filter(
+      (item) => item.productId.toString() !== prodId.toString()
+    );
+
+    return getDb()
+      .collection('users')
+      .updateOne(
+        { _id: new ObjectId(this._id) },
+        { $set: { cart: { items: updatedCartItems } } }
+      );
+  }
+
+  addOrder() {
+    const db = getDb();
+
+    return db
+      .collection('orders')
+      .insertOne(this.cart)
+      .then((result) => {
+        this.cart = { items: [] };
+        return db
+          .collection('users')
+          .updateOne(
+            { _id: new ObjectId(this._id) },
+            { $set: { cart: { items: [] } } }
+          );
+      });
+  }
+
   static findUserById(userId) {
     return getDb()
       .collection('users')
