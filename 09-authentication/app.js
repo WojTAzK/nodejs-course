@@ -58,18 +58,6 @@ mongoose
   .connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then((result) => {
     console.log('Connected to DB!');
-    User.findOne().then((user) => {
-      if (!user) {
-        const user = new User({
-          name: 'Wojciech',
-          email: 'error@404.not_found',
-          cart: {
-            items: [],
-          },
-        });
-        user.save();
-      }
-    });
     app.listen(3000);
   })
   .catch((err) => {
