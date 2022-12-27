@@ -2,11 +2,16 @@ const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 
 exports.getLogin = (req, res, next) => {
+  let errorMessage = req.flash('error');
+  if (errorMessage.length > 0) errorMessage = errorMessage[0];
+  else errorMessage = null;
+  // console.log(errorMessage);
+
   res.render('auth/login', {
     path: '/login',
     pageTitle: 'Login',
     isAuthenticated: false,
-    errorMessage: req.flash('error'),
+    errorMessage,
   });
 };
 
@@ -15,6 +20,7 @@ exports.getSignup = (req, res, next) => {
     path: '/signup',
     pageTitle: 'Signup',
     isAuthenticated: false,
+    errorMessage: req.flash('error')[0],
   });
 };
 
@@ -43,6 +49,7 @@ exports.postLogin = (req, res, next) => {
             });
           }
 
+          req.flash('error', 'Invalid email or password');
           return res.redirect('/login');
         })
         .catch((err) => {
@@ -59,7 +66,13 @@ exports.postSignup = (req, res, next) => {
 
   User.findOne({ email: email })
     .then((userDoc) => {
-      if (userDoc) return res.redirect('/signup');
+      if (userDoc) {
+        req.flash(
+          'error',
+          'An account with this e-mail address already exists!'
+        );
+        return res.redirect('/signup');
+      }
 
       return bcrypt
         .hash(password, 12)
