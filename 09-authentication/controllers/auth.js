@@ -1,3 +1,5 @@
+const crypto = require('crypto'); // secure random values
+
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
@@ -102,7 +104,7 @@ exports.postSignup = (req, res, next) => {
             to: email,
             from: 'shop@hello.there.com',
             subject: 'Signup succeeded',
-            html: '<h1>Hurray, you signed up! ',
+            html: '<h1>Hurray, you signed up!</h1>',
           });
         });
     })
@@ -117,9 +119,43 @@ exports.postLogout = (req, res, next) => {
 };
 
 exports.getReset = (req, res, next) => {
-  res.render('/auth/reset', {
+  res.render('auth/reset', {
     path: '/reset',
     pageTitle: 'Reset Password',
     errorMessage: req.flash('error')[0],
+  });
+};
+
+exports.postReset = (req, res, next) => {
+  crypto.randomBytes(32, (err, buffer) => {
+    if (err) return res.redirect('/reset');
+
+    const token = buffer.toString('hex');
+
+    User.findOne({ email: req.body.email })
+      .then((user) => {
+        if (!user) {
+          req.flash('error', 'No account with that email found');
+          return res.redirect('/reset');
+        }
+
+        user.resetToken = token;
+        user.resetTokenExpiration = Date.now() + 3600_000;
+
+        return user.save();
+      })
+      .then((result) => {
+        res.redirect('/');
+        transporter.sendMail({
+          to: req.body.email,
+          from: 'shop@hello.there.com',
+          subject: 'Password reset',
+          html: `
+            <p>You requested password reset</p>
+            <p>Click this <a href="http://localhost:3000/reset/${token}">link</a> to set a new password</p>
+          `,
+        });
+      })
+      .catch((err) => console.log('postReset error:', err));
   });
 };
